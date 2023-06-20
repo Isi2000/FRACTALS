@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+import seaborn as sns
+import pandas as pd
 #since the condition on the mandelbrot fractal is indipendent of the class I can write it outside
 
 
@@ -32,7 +33,7 @@ class fractal_board:
     """
     def __init__(self, dim):
         self.dim = dim
-        self.board = np.full((self.dim, self.dim), 256)
+        self.board = np.full((self.dim, self.dim), 1., dtype = float)
 
     """
     keep in mind that The left-most extent of the set ends with the spike 
@@ -50,16 +51,24 @@ class fractal_board:
         for x in range(self.dim):
             for y in range(self.dim):
                 number_iterations = n_iter(0, complex(*f(x,y)), 500)
-                self.board[y][x] = 255-number_iterations
+                self.board[y][x] = (1-number_iterations/500)
 
     def plotter(self):
         """
         shows the fractal
         """
-        plt.imshow(self.board, cmap = "plasma")
-        plt.axis('off')
+
+        # construct DataFrame from Numpy Array
+        zoomed_board = self.board[self.dim//8*5 : self.dim//8*6 , self.dim//8*4 : self.dim//8*5] 
+
+        my_data = pd.DataFrame(data = zoomed_board)
+
+        # create the plot
+        fig, heat_plot = plt.subplots()
+        heat_plot = sns.heatmap(data=my_data,cmap='plasma' )
+        heat_plot.set_title("Heatmap plot (w Seaborn)");
         plt.show()
 
-a =  fractal_board(1000)
+a =  fractal_board(10000)
 a.coloring_board()
 a.plotter()
